@@ -15,6 +15,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     platforms=['any'],
+    python_requires='>3.5.2',
     install_requires=[
         "future >= 0.16.0",
         "h5py",
