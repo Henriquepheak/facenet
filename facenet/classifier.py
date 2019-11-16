@@ -1,8 +1,9 @@
-"""An example of how to use your own dataset to train a classifier that recognizes people.
+"""An example of how to use your own dataset to train a classifier that
+recognizes people.
 """
 # MIT License
 # 
-# Copyright (c) 2016 David Sandberg
+# Copyright (c) 2016 David Sandberg 
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -11,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,6 +22,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
+
 
 from __future__ import absolute_import
 from __future__ import division
@@ -36,6 +39,7 @@ import math
 import pickle
 from sklearn.svm import SVC
 
+
 def main(args):
   
     with tf.Graph().as_default():
@@ -46,18 +50,20 @@ def main(args):
             
             if args.use_split_dataset:
                 dataset_tmp = facenet.get_dataset(args.data_dir)
-                train_set, test_set = split_dataset(dataset_tmp, args.min_nrof_images_per_class, args.nrof_train_images_per_class)
-                if (args.mode=='TRAIN'):
+                train_set, test_set = split_dataset(dataset_tmp,
+                                                    args.min_nrof_images_per_class,  # noqa E:501
+                                                    args.nrof_train_images_per_class)  # noqa E:501  
+                if (args.mode == 'TRAIN'):
                     dataset = train_set
-                elif (args.mode=='CLASSIFY'):
+                elif (args.mode == 'CLASSIFY'):
                     dataset = test_set
             else:
                 dataset = facenet.get_dataset(args.data_dir)
 
             # Check that there are at least one training image per class
             for cls in dataset:
-                assert(len(cls.image_paths)>0, 'There must be at least one image for each class in the dataset')            
-
+                # Must be at least one image for each class in the dataset
+                assert(len(cls.image_paths) > 0)        
                  
             paths, labels = facenet.get_image_paths_and_labels(dataset)
             
@@ -69,34 +75,37 @@ def main(args):
             facenet.load_model(args.model)
             
             # Get input and output tensors
-            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
-            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")  # noqa E:501
+            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")  # noqa E:501
+            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")  # noqa E:501
             embedding_size = embeddings.get_shape()[1]
             
             # Run forward pass to calculate embeddings
             print('Calculating features for images')
             nrof_images = len(paths)
-            nrof_batches_per_epoch = int(math.ceil(1.0*nrof_images / args.batch_size))
+            nrof_batches_per_epoch = int(math.ceil(1.0*nrof_images /
+                                                   args.batch_size))
             emb_array = np.zeros((nrof_images, embedding_size))
             for i in range(nrof_batches_per_epoch):
                 start_index = i*args.batch_size
                 end_index = min((i+1)*args.batch_size, nrof_images)
                 paths_batch = paths[start_index:end_index]
-                images = facenet.load_data(paths_batch, False, False, args.image_size)
-                feed_dict = { images_placeholder:images, phase_train_placeholder:False }
-                emb_array[start_index:end_index,:] = sess.run(embeddings, feed_dict=feed_dict)
+                images = facenet.load_data(paths_batch, False, False,
+                                           args.image_size)
+                feed_dict = {images_placeholder: images,
+                             phase_train_placeholder: False}
+                emb_array[start_index:end_index, :] = sess.run(embeddings, feed_dict=feed_dict)   # noqa E:501
             
-            classifier_filename_exp = os.path.expanduser(args.classifier_filename)
+            classifier_filename_exp = os.path.expanduser(args.classifier_filename)  # noqa E:501
 
-            if (args.mode=='TRAIN'):
+            if (args.mode == 'TRAIN'):
                 # Train classifier
                 print('Training classifier')
                 model = SVC(kernel='linear', probability=True)
                 model.fit(emb_array, labels)
             
                 # Create a list of class names
-                class_names = [ cls.name.replace('_', ' ') for cls in dataset]
+                class_names = [cls.name.replace('_', ' ') for cls in dataset]
 
                 # Saving classifier model
                 with open(classifier_filename_exp, 'wb') as outfile:
