@@ -1,1 +1,1 @@
-from .detect_face import *  # noqa F403
+from .detect_face import *  # noaq F403
