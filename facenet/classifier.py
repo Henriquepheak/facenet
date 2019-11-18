@@ -159,8 +159,8 @@ def parse_arguments(argv):
                               ' aligned LFW face patches.'))
     parser.add_argument('model', type=str,
                         help=('Could be either a directory containing'
-                              ' the meta_file and ckpt_file or a model protobuf'
-                              ' (.pb) file'))
+                              ' the meta_file and ckpt_file or a model'
+                              ' protobuf (.pb) file'))
     parser.add_argument('classifier_filename',
                         help=('Classifier model file name as a pickle (.pkl)'
                               ' file. For training this is the output and for'
