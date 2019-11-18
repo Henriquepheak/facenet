@@ -49,9 +49,9 @@ def main(args):
                 train_set, test_set = split_dataset(dataset_tmp,
                                                     args.min_nrof_images_per_class,  # noqa E501
                                                     args.nrof_train_images_per_class)  # noqa E501  
-                if (args.mode == 'TRAIN'):
+                if args.mode == 'TRAIN':
                     dataset = train_set
-                elif (args.mode == 'CLASSIFY'):
+                elif args.mode == 'CLASSIFY':
                     dataset = test_set
             else:
                 dataset = facenet.get_dataset(args.data_dir)
